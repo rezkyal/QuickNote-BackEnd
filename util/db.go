@@ -22,5 +22,6 @@ func GetDB() (*gorm.DB, error) {
 	if err != nil {
 		panic(fmt.Sprintf("DB: %v", err))
 	}
+
 	return conn, nil
 }
