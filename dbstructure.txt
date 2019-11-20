@@ -1,16 +1,15 @@
 CREATE TABLE Users(
-   user_id serial PRIMARY KEY,
-   username VARCHAR (100) UNIQUE NOT NULL,
+   username VARCHAR (100) PRIMARY KEY UNIQUE NOT NULL,
    password VARCHAR (50),
    created_on TIMESTAMP NOT NULL
 );
 
 CREATE TABLE Notes(
 	note_id serial PRIMARY KEY,
-	user_id INTEGER,
+	username VARCHAR(100),
 	title text,
 	note text,
 	created_on TIMESTAMP NOT NULL,
     updated_on TIMESTAMP,
-	FOREIGN KEY (user_id) REFERENCES users(user_id)
+	FOREIGN KEY (username) REFERENCES users(username)
 )

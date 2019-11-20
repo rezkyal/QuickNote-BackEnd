@@ -17,17 +17,21 @@ func (n *UserQuery) Init(db *gorm.DB) {
 	n.db = db
 }
 
-func (n *UserQuery) FindOrCreateUser(username string) int64 {
+func (n *UserQuery) FindOrCreateUser(username string) models.User {
 	var user models.User
 	state := n.db.Where("Username = ?", username).First(&user)
 	if state.Error != nil {
 		if gorm.IsRecordNotFoundError(state.Error) {
 			user = models.User{Username: username, Password: "", CreatedOn: time.Now()}
-			n.db.Create(&user)
+			err := n.db.Create(&user)
+
+			if err.Error != nil {
+				log.Panic(err.Error)
+			}
+
 		} else {
 			log.Panic(state.Error)
 		}
 	}
-
-	return user.UserID
+	return user
 }

@@ -3,9 +3,8 @@ package models
 import "time"
 
 type User struct {
-	UserID     int64  `gorm:"PRIMARY_KEY; AUTO_INCREMENT; UNIQUE"`
-	Username   string `gorm: "UNIQUE"`
+	Username   string `gorm: "PRIMARY_KEY; UNIQUE"`
 	Password   string `gorm: "DEFAULT NULL"`
 	CreatedOn  time.Time
-	NotesOwned []Note `gorm:"foreignkey:UserID"`
+	NotesOwned []Note `gorm:"foreignkey:Username"`
 }
