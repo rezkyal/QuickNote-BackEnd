@@ -1,0 +1,15 @@
+CREATE TABLE Users(
+   UserID serial PRIMARY KEY,
+   Username VARCHAR (100) UNIQUE NOT NULL,
+   Password VARCHAR (50),
+   CreatedOn TIMESTAMP NOT NULL
+);
+
+CREATE TABLE Note(
+	NoteID serial PRIMARY KEY,
+	UserID INTEGER,
+	Title text,
+	Note text,
+	CreatedOn TIMESTAMP NOT NULL,
+	FOREIGN KEY (UserID) REFERENCES users(UserID)
+)

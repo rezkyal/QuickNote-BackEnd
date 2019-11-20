@@ -2,22 +2,23 @@ package util
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
+	"io/ioutil"
 
-	_ "github.com/lib/pq"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 var db *sql.DB
 
 // GetDB method returns a DB instance
-func GetDB() (*sql.DB, error) {
-	connectionString := "user=postgres password=password dbname=QuikNote"
-	// connectionString := os.Getenv("POSTGRES_CONNECTION_STRING")
-	if connectionString == "" {
-		return nil, errors.New("'POSTGRES_CONNECTION_STRING' environment variable not set")
+func GetDB() (*gorm.DB, error) {
+	dat, err := ioutil.ReadFile("dbconf.txt")
+	if err != nil {
+		panic(fmt.Sprintf("Read conf: %v", err))
 	}
-	conn, err := sql.Open("postgres", connectionString)
+
+	conn, err := gorm.Open("postgres", string(dat))
 	if err != nil {
 		panic(fmt.Sprintf("DB: %v", err))
 	}

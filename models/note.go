@@ -1,9 +1,14 @@
 package models
 
+import (
+	"github.com/jinzhu/gorm"
+)
+
 type Note struct {
-	NoteID    int64  `json:"note_id"`
-	UserID    int64  `json:"user_id"`
-	Title     string `json:"title"`
-	Note      string `json:"note"`
-	CreatedOn string `json:"created_on"`
+	gorm.Model
+	NoteID    int64 `gorm:"PRIMARY_KEY;UNIQUE;AUTO_INCREMENT"`
+	UserID    int64
+	Title     string
+	Note      string
+	CreatedOn string
 }

@@ -14,7 +14,4 @@ func main() {
 		log.Panic(err)
 	}
 	defer db.Close()
-
-	router.GET("/noteDetail")
-	router.GET("/")
 }
