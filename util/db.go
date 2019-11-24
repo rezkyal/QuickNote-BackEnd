@@ -13,7 +13,7 @@ var db *sql.DB
 
 // GetDB method returns a DB instance
 func GetDB() (*gorm.DB, error) {
-	dat, err := ioutil.ReadFile("dbconf.txt")
+	dat, err := ioutil.ReadFile("../dbconf.txt")
 	if err != nil {
 		panic(fmt.Sprintf("Read conf: %v", err))
 	}

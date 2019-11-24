@@ -24,6 +24,8 @@ func main() {
 	userQuery.Init(db)
 	noteQuery.Init(db)
 
+	// router.GET("/readAllNote/:username",controllers.)
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"

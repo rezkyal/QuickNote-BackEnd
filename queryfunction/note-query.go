@@ -1,6 +1,7 @@
 package queryfunction
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -18,6 +19,7 @@ func (n *NoteQuery) Init(db *gorm.DB) {
 
 func (n *NoteQuery) CreateNote(username string) models.Note {
 	nt := models.Note{Username: username, CreatedOn: time.Now()}
+	fmt.Printf("%d", nt.NoteID)
 	err := n.db.Create(&nt)
 	if err.Error != nil {
 		log.Panic(err.Error)
@@ -27,7 +29,7 @@ func (n *NoteQuery) CreateNote(username string) models.Note {
 
 func (n *NoteQuery) FindNote(note_id int64) models.Note {
 	var note models.Note
-	err := n.db.Where("note_id", note_id).First(&note)
+	err := n.db.Where("note_id = ?", note_id).First(&note)
 	if err.Error != nil {
 		log.Panic(err.Error)
 	}
@@ -35,7 +37,7 @@ func (n *NoteQuery) FindNote(note_id int64) models.Note {
 }
 
 func (n *NoteQuery) UpdateNote(note models.Note) models.Note {
-	err := n.db.Update(&note)
+	err := n.db.Save(&note)
 	if err.Error != nil {
 		log.Panic(err.Error)
 	}
