@@ -9,4 +9,5 @@ type Note struct {
 	Note      string
 	CreatedOn time.Time
 	UpdatedOn time.Time
+	User      User `gorm:"foreignkey:Username;association_foreignkey:Username"`
 }

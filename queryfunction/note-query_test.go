@@ -12,21 +12,23 @@ import (
 	"github.com/rezkyal/QuickNote-BackEnd/util"
 )
 
-func initQuery() (NoteQuery, *gorm.DB) {
-	db, err := util.GetDB()
+func initQuery() (NoteQuery, UserQuery, *gorm.DB) {
+	db, err := util.GetDBTest()
 
 	if err != nil {
 		log.Panic(err)
 	}
 
 	var noteQuery NoteQuery
+	var userQuery UserQuery
 	noteQuery.Init(db)
+	userQuery.Init(db)
 
-	return noteQuery, db
+	return noteQuery, userQuery, db
 }
 
 func TestCreateAndDelete(t *testing.T) {
-	noteQuery, db := initQuery()
+	noteQuery, _, db := initQuery()
 	defer db.Close()
 	note := noteQuery.CreateNote("admin")
 	noteID := note.NoteID
@@ -38,7 +40,7 @@ func TestCreateAndDelete(t *testing.T) {
 }
 
 func TestRead(t *testing.T) {
-	noteQuery, db := initQuery()
+	noteQuery, _, db := initQuery()
 	defer db.Close()
 	note := noteQuery.FindNote(1)
 	if note.Title != "this is a testing note" {
@@ -69,7 +71,7 @@ func searchOne(t *testing.T, noteQuery NoteQuery, query string, expectedID []int
 }
 
 func TestSearch(t *testing.T) {
-	noteQuery, db := initQuery()
+	noteQuery, _, db := initQuery()
 	defer db.Close()
 
 	expectedID := []int64{1, 2, 3}
@@ -90,7 +92,7 @@ func TestSearch(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	noteQuery, db := initQuery()
+	noteQuery, _, db := initQuery()
 	note := noteQuery.FindNote(1)
 	note.Title = "this is an update test"
 	note.Note = "this is an update test"

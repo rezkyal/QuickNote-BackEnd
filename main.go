@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rezkyal/QuickNote-BackEnd/queryfunction"
 
+	"github.com/rezkyal/QuickNote-BackEnd/controllers"
 	"github.com/rezkyal/QuickNote-BackEnd/util"
 )
 
@@ -19,12 +19,17 @@ func main() {
 	}
 	defer db.Close()
 
-	var userQuery queryfunction.UserQuery
-	var noteQuery queryfunction.NoteQuery
-	userQuery.Init(db)
-	noteQuery.Init(db)
+	var userController controllers.UserController
+	var noteController controllers.NoteController
+	userController.Init(db)
+	noteController.Init(db)
 
-	// router.GET("/readAllNote/:username",controllers.)
+	router.GET("/readAllNote/:username", noteController.ReadAllNote)
+	router.POST("/readSearchNote", noteController.ReadSearchNote)
+	router.GET("/createOneNote/:username", noteController.CreateOneNote)
+	router.POST("/readOneNote", noteController.ReadOneNote)
+	router.POST("/updateOneNote", noteController.UpdateOneNote)
+	router.POST("/deleteOneNote", noteController.DeleteOneNote)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -33,5 +38,4 @@ func main() {
 	}
 	router.Run(":" + port)
 
-	userQuery.FindOrCreateUser("hiyahiya")
 }

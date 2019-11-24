@@ -11,9 +11,8 @@ import (
 
 var db *sql.DB
 
-// GetDB method returns a DB instance
-func GetDB() (*gorm.DB, error) {
-	dat, err := ioutil.ReadFile("../dbconf.txt")
+func dbConn(fileDirection string) (*gorm.DB, error) {
+	dat, err := ioutil.ReadFile(fileDirection)
 	if err != nil {
 		panic(fmt.Sprintf("Read conf: %v", err))
 	}
@@ -24,4 +23,13 @@ func GetDB() (*gorm.DB, error) {
 	}
 
 	return conn, nil
+}
+
+// GetDB method returns a DB instance
+func GetDB() (*gorm.DB, error) {
+	return dbConn("dbconf.txt")
+}
+
+func GetDBTest() (*gorm.DB, error) {
+	return dbConn("./../dbconf.txt")
 }

@@ -50,12 +50,27 @@ func (n *NoteController) CreateOneNote(c *gin.Context) {
 func (n *NoteController) ReadAllNote(c *gin.Context) {
 	username := c.Param("username")
 	user := n.userQuery.FindOrCreateUser(username)
+	fmt.Println(user.NotesOwned)
 	for i := range user.NotesOwned {
+		fmt.Println(user.NotesOwned[i].Title)
 		user.NotesOwned[i].Title = util.Ellipsis(user.NotesOwned[i].Title, 150)
 		user.NotesOwned[i].Note = util.Ellipsis(user.NotesOwned[i].Note, 150)
 	}
 
 	c.JSON(200, user.NotesOwned)
+}
+
+func (n *NoteController) ReadSearchNote(c *gin.Context) {
+	username := c.PostForm("username")
+	query := c.PostForm("query")
+	notes := n.noteQuery.FindNoteByQuery(username, query)
+
+	for i := range notes {
+		notes[i].Title = util.Ellipsis(notes[i].Title, 150)
+		notes[i].Note = util.Ellipsis(notes[i].Note, 150)
+	}
+
+	c.JSON(200, notes)
 }
 
 func (n *NoteController) ReadOneNote(c *gin.Context) {
