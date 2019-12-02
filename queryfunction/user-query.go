@@ -13,17 +13,33 @@ type UserQuery struct {
 	db *gorm.DB
 }
 
-func (n *UserQuery) Init(db *gorm.DB) {
-	n.db = db
+func (u *UserQuery) Init(db *gorm.DB) {
+	u.db = db
 }
 
-func (n *UserQuery) FindOrCreateUser(username string) models.User {
+func (u *UserQuery) CreateUser(username string) (models.User, bool) {
 	var user models.User
-	state := n.db.Where("Username = ?", username).Preload("NotesOwned").First(&user)
+	state := u.db.Where("Username = ?", username).First(&user)
+	if gorm.IsRecordNotFoundError(state.Error) {
+		user = models.User{Username: username, Password: "", CreatedOn: time.Now()}
+		err := u.db.Create(&user)
+
+		if err.Error != nil {
+			log.Panic(err.Error)
+		}
+
+		return user, true
+	}
+	return models.User{}, false
+}
+
+func (u *UserQuery) FindOrCreateUser(username string) models.User {
+	var user models.User
+	state := u.db.Where("Username = ?", username).Preload("NotesOwned").First(&user)
 	if state.Error != nil {
 		if gorm.IsRecordNotFoundError(state.Error) {
 			user = models.User{Username: username, Password: "", CreatedOn: time.Now()}
-			err := n.db.Create(&user)
+			err := u.db.Create(&user)
 
 			if err.Error != nil {
 				log.Panic(err.Error)
@@ -32,6 +48,14 @@ func (n *UserQuery) FindOrCreateUser(username string) models.User {
 		} else {
 			log.Panic(state.Error)
 		}
+	}
+	return user
+}
+
+func (u *UserQuery) UpdateUser(user models.User) models.User {
+	err := u.db.Save(&user)
+	if err.Error != nil {
+		log.Panic(err.Error)
 	}
 	return user
 }

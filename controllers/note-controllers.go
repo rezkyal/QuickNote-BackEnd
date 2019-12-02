@@ -5,6 +5,7 @@ import (
 	"log"
 	"strconv"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/rezkyal/QuickNote-BackEnd/models"
 
 	"github.com/gin-gonic/gin"
@@ -42,7 +43,9 @@ func readNote(n *NoteController, c *gin.Context) (models.Note, error) {
 }
 
 func (n *NoteController) CreateOneNote(c *gin.Context) {
-	username := c.Param("username")
+	session := sessions.Default(c)
+	username := session.Get("username").(string)
+
 	note := n.noteQuery.CreateNote(username)
 	c.JSON(200, note)
 }
@@ -50,9 +53,20 @@ func (n *NoteController) CreateOneNote(c *gin.Context) {
 func (n *NoteController) ReadAllNote(c *gin.Context) {
 	username := c.Param("username")
 	user := n.userQuery.FindOrCreateUser(username)
-	fmt.Println(user.NotesOwned)
+
+	session := sessions.Default(c)
+
+	if session.Get("username").(string) != username {
+		session.Set("username", username)
+		if user.Password == "" {
+			session.Set("loggedin", true)
+		} else {
+			session.Set("loggedin", false)
+		}
+
+	}
+
 	for i := range user.NotesOwned {
-		fmt.Println(user.NotesOwned[i].Title)
 		user.NotesOwned[i].Title = util.Ellipsis(user.NotesOwned[i].Title, 150)
 		user.NotesOwned[i].Note = util.Ellipsis(user.NotesOwned[i].Note, 150)
 	}
@@ -61,7 +75,9 @@ func (n *NoteController) ReadAllNote(c *gin.Context) {
 }
 
 func (n *NoteController) ReadSearchNote(c *gin.Context) {
-	username := c.PostForm("username")
+	session := sessions.Default(c)
+	username := session.Get("username").(string)
+
 	query := c.PostForm("query")
 	notes := n.noteQuery.FindNoteByQuery(username, query)
 
