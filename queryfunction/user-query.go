@@ -52,10 +52,9 @@ func (u *UserQuery) FindOrCreateUser(username string) models.User {
 	return user
 }
 
-func (u *UserQuery) UpdateUser(user models.User) models.User {
+func (u *UserQuery) UpdateUser(user models.User) {
 	err := u.db.Save(&user)
 	if err.Error != nil {
 		log.Panic(err.Error)
 	}
-	return user
 }

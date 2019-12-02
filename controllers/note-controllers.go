@@ -51,10 +51,10 @@ func (n *NoteController) CreateOneNote(c *gin.Context) {
 }
 
 func (n *NoteController) ReadAllNote(c *gin.Context) {
-	username := c.Param("username")
-	user := n.userQuery.FindOrCreateUser(username)
-
 	session := sessions.Default(c)
+	username := session.Get("username").(string)
+
+	user := n.userQuery.FindOrCreateUser(username)
 
 	if session.Get("username").(string) != username {
 		session.Set("username", username)
@@ -69,8 +69,8 @@ func (n *NoteController) ReadAllNote(c *gin.Context) {
 	for i := range user.NotesOwned {
 		user.NotesOwned[i].Title = util.Ellipsis(user.NotesOwned[i].Title, 150)
 		user.NotesOwned[i].Note = util.Ellipsis(user.NotesOwned[i].Note, 150)
+		user.NotesOwned[i].User = models.User{}
 	}
-
 	c.JSON(200, user.NotesOwned)
 }
 

@@ -23,7 +23,7 @@ func main() {
 	}
 	defer db.Close()
 
-	store, err := redis.NewStore(10, "tcp", "localhost:6379", "", []byte("secret"))
+	store, err := redis.NewStore(10, "tcp", "localhost:6379", "", []byte("qu1ckn0t3"))
 	if err != nil {
 		log.Panic(err)
 	}
@@ -35,32 +35,24 @@ func main() {
 	userController.Init(db)
 	noteController.Init(db)
 
-	r.GET("/incr", func(c *gin.Context) {
-		session := sessions.Default(c)
-		var count int
-		v := session.Get("count")
-		if v == nil {
-			count = 0
-		} else {
-			count = v.(int)
-			count++
-		}
-		session.Set("count", count)
-		session.Save()
-		c.JSON(200, gin.H{"count": count})
-	})
+	r.GET("/api/user", userController.CreateUser)
+	r.GET("/api/user/initUser/:username", userController.InitUser)
+	r.POST("/api/user/login", userController.Login)
+	r.GET("/api/user/logout", userController.Logout)
+	r.POST("/api/user/setNewPassword", userController.SetNewPassword)
 
-	r.GET("/api", userController.CreateUser)
-	r.GET("/api/readAllNote/:username", noteController.ReadAllNote)
-
-	authorized := r.Group("/")
+	authorized := r.Group("/api")
 	authorized.Use(middleware.Auth())
 	{
-		authorized.POST("/api/readSearchNote", noteController.ReadSearchNote)
-		authorized.GET("/api/createOneNote", noteController.CreateOneNote)
-		authorized.POST("/api/readOneNote", noteController.ReadOneNote)
-		authorized.POST("/api/updateOneNote", noteController.UpdateOneNote)
-		authorized.POST("/api/deleteOneNote", noteController.DeleteOneNote)
+		authorized.POST("/user/changePassword", userController.ChangePassword)
+
+		note := authorized.Group("/note")
+		note.GET("/readAllNote", noteController.ReadAllNote)
+		note.POST("/readSearchNote", noteController.ReadSearchNote)
+		note.GET("/createOneNote", noteController.CreateOneNote)
+		note.POST("/readOneNote", noteController.ReadOneNote)
+		note.POST("/updateOneNote", noteController.UpdateOneNote)
+		note.POST("/deleteOneNote", noteController.DeleteOneNote)
 	}
 
 	port := os.Getenv("PORT")
