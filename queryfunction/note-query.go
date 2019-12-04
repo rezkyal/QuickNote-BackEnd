@@ -1,7 +1,6 @@
 package queryfunction
 
 import (
-	"fmt"
 	"log"
 	"time"
 
@@ -19,7 +18,6 @@ func (n *NoteQuery) Init(db *gorm.DB) {
 
 func (n *NoteQuery) CreateNote(username string) models.Note {
 	nt := models.Note{Username: username, CreatedOn: time.Now().UTC(), UpdatedOn: time.Now().UTC()}
-	fmt.Printf("%d", nt.NoteID)
 	err := n.db.Create(&nt)
 	if err.Error != nil {
 		log.Panic(err.Error)

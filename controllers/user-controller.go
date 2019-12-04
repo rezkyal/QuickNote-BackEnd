@@ -76,7 +76,7 @@ func (u *UserController) SetNewPassword(c *gin.Context) {
 	user := u.userQuery.FindOrCreateUser(username)
 	password := []byte(c.PostForm("password"))
 	setPassword(u, user, password)
-	c.JSON(200, gin.H{"success": "1"})
+	c.JSON(200, gin.H{"status": "1", "username": username})
 }
 
 func (u *UserController) ChangePassword(c *gin.Context) {
@@ -92,7 +92,7 @@ func (u *UserController) ChangePassword(c *gin.Context) {
 		c.JSON(400, gin.H{"status": "0", "message": "Wrong old password!"})
 	} else {
 		setPassword(u, user, newpassword)
-		c.JSON(200, gin.H{"status": "1"})
+		c.JSON(200, gin.H{"status": "1", "username": username})
 	}
 
 }
@@ -106,7 +106,7 @@ func (u *UserController) Login(c *gin.Context) {
 	stats := checkPassword(u, user, password)
 
 	if !stats {
-		c.JSON(400, gin.H{"status": "0", "message": "Wrong password!"})
+		c.JSON(200, gin.H{"status": "0", "message": "Wrong password!"})
 	} else {
 		session.Set("loggedin", true)
 
@@ -115,7 +115,7 @@ func (u *UserController) Login(c *gin.Context) {
 			log.Panic(err)
 		}
 
-		c.JSON(200, gin.H{"status": "1"})
+		c.JSON(200, gin.H{"status": "1", "username": username})
 	}
 }
 
@@ -123,12 +123,14 @@ func (u *UserController) Logout(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Set("loggedin", false)
 
+	username := session.Get("username")
+
 	err := session.Save()
 	if err != nil {
 		log.Panic(err)
 	}
 
-	c.JSON(200, gin.H{"status": "1"})
+	c.JSON(200, gin.H{"status": "1", "username": username})
 }
 
 func checkPassword(u *UserController, user models.User, password []byte) bool {
