@@ -18,7 +18,7 @@ func (n *NoteQuery) Init(db *gorm.DB) {
 }
 
 func (n *NoteQuery) CreateNote(username string) models.Note {
-	nt := models.Note{Username: username, CreatedOn: time.Now()}
+	nt := models.Note{Username: username, CreatedOn: time.Now().UTC(), UpdatedOn: time.Now().UTC()}
 	fmt.Printf("%d", nt.NoteID)
 	err := n.db.Create(&nt)
 	if err.Error != nil {
@@ -50,6 +50,7 @@ func (n *NoteQuery) FindNoteByQuery(username string, query string) []models.Note
 }
 
 func (n *NoteQuery) UpdateNote(note models.Note) models.Note {
+	note.UpdatedOn = time.Now().UTC()
 	err := n.db.Save(&note)
 	if err.Error != nil {
 		log.Panic(err.Error)

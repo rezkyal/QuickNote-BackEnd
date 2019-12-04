@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"log"
+	"strconv"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -22,6 +23,7 @@ func (u *UserController) Init(db *gorm.DB) {
 
 func (u *UserController) InitUser(c *gin.Context) {
 	username := c.Param("username")
+
 	user := u.userQuery.FindOrCreateUser(username)
 
 	session := sessions.Default(c)
@@ -33,18 +35,28 @@ func (u *UserController) InitUser(c *gin.Context) {
 	}
 
 	if checkname != username {
+		loggedin := false
 		session.Set("username", username)
 		if user.Password == "" {
-			session.Set("loggedin", true)
-		} else {
-			session.Set("loggedin", false)
+			loggedin = true
 		}
+		session.Set("loggedin", loggedin)
 	}
+
 	err := session.Save()
 	if err != nil {
 		log.Panic(err)
 	}
-	c.JSON(200, gin.H{"status": "1", "username": session.Get("username").(string)})
+
+	loggedin := session.Get("loggedin").(bool)
+
+	hasPassword := "true" //already has password
+
+	if user.Password == "" {
+		hasPassword = "false" //not yet
+	}
+
+	c.JSON(200, gin.H{"status": "1", "hasPassword": hasPassword, "username": session.Get("username").(string), "loggedin": strconv.FormatBool(loggedin)})
 }
 
 func (u *UserController) CreateUser(c *gin.Context) {

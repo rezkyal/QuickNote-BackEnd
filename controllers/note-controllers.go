@@ -30,12 +30,12 @@ func (n *NoteController) Init(db *gorm.DB) {
 func readNote(n *NoteController, c *gin.Context) (models.Note, error) {
 	noteid := c.DefaultPostForm("noteid", "0")
 	if noteid == "0" {
-		return models.Note{}, fmt.Errorf("noteID field empty")
+		return models.Note{}, fmt.Errorf("noteid field empty")
 	}
 
 	noteidint, err := strconv.ParseInt(noteid, 10, 64)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 
 	note := n.noteQuery.FindNote(noteidint)
@@ -68,7 +68,7 @@ func (n *NoteController) ReadAllNote(c *gin.Context) {
 
 	for i := range user.NotesOwned {
 		user.NotesOwned[i].Title = util.Ellipsis(user.NotesOwned[i].Title, 150)
-		user.NotesOwned[i].Note = util.Ellipsis(user.NotesOwned[i].Note, 150)
+		user.NotesOwned[i].Note = util.Ellipsis(user.NotesOwned[i].Note, 300)
 		user.NotesOwned[i].User = models.User{}
 	}
 	c.JSON(200, user.NotesOwned)

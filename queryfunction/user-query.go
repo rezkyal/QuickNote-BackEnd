@@ -21,7 +21,7 @@ func (u *UserQuery) CreateUser(username string) (models.User, bool) {
 	var user models.User
 	state := u.db.Where("Username = ?", username).First(&user)
 	if gorm.IsRecordNotFoundError(state.Error) {
-		user = models.User{Username: username, Password: "", CreatedOn: time.Now()}
+		user = models.User{Username: username, Password: "", CreatedOn: time.Now().UTC()}
 		err := u.db.Create(&user)
 
 		if err.Error != nil {
@@ -38,7 +38,7 @@ func (u *UserQuery) FindOrCreateUser(username string) models.User {
 	state := u.db.Where("Username = ?", username).Preload("NotesOwned").First(&user)
 	if state.Error != nil {
 		if gorm.IsRecordNotFoundError(state.Error) {
-			user = models.User{Username: username, Password: "", CreatedOn: time.Now()}
+			user = models.User{Username: username, Password: "", CreatedOn: time.Now().UTC()}
 			err := u.db.Create(&user)
 
 			if err.Error != nil {
