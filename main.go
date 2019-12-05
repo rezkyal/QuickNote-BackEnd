@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/redis"
+	"github.com/gin-contrib/sessions/memstore"
 
 	"github.com/rezkyal/QuickNote-BackEnd/controllers"
 	"github.com/rezkyal/QuickNote-BackEnd/middleware"
@@ -31,10 +31,12 @@ func main() {
 	}
 	defer db.Close()
 
-	store, err := redis.NewStore(10, "tcp", "localhost:6379", "", []byte("qu1ckn0t3"))
-	if err != nil {
-		log.Panic(err)
-	}
+	// store, err := redis.NewStore(10, "tcp", "localhost:6379", "", []byte("qu1ckn0t3"))
+	// if err != nil {
+	// 	log.Panic(err)
+	// }
+
+	store := memstore.NewStore([]byte("secret"))
 
 	r.Use(sessions.Sessions("mysession", store))
 

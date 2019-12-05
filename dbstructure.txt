@@ -1,6 +1,6 @@
 CREATE TABLE Users(
    username VARCHAR (100) PRIMARY KEY UNIQUE NOT NULL,
-   password VARCHAR (50),
+   password VARCHAR (100),
    created_on TIMESTAMP NOT NULL
 );
 

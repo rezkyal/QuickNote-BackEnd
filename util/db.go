@@ -3,7 +3,7 @@ package util
 import (
 	"database/sql"
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -12,12 +12,8 @@ import (
 var db *sql.DB
 
 func dbConn(fileDirection string) (*gorm.DB, error) {
-	dat, err := ioutil.ReadFile(fileDirection)
-	if err != nil {
-		panic(fmt.Sprintf("Read conf: %v", err))
-	}
 
-	conn, err := gorm.Open("postgres", string(dat))
+	conn, err := gorm.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		panic(fmt.Sprintf("DB: %v", err))
 	}
