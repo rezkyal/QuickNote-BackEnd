@@ -19,7 +19,8 @@ func main() {
 	r := gin.Default()
 
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:3000"}
+	config.AllowOrigins = []string{"https://quiknote-frontend.herokuapp.com/"}
+	// config.AllowOrigins = []string{"http://localhost:3000"}
 	config.AllowCredentials = true
 
 	r.Use(cors.New(config))
