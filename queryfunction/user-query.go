@@ -35,7 +35,9 @@ func (u *UserQuery) CreateUser(username string) (models.User, bool) {
 
 func (u *UserQuery) FindOrCreateUser(username string) models.User {
 	var user models.User
-	state := u.db.Where("Username = ?", username).Preload("NotesOwned").First(&user)
+	state := u.db.Where("Username = ?", username).Preload("NotesOwned", func(db *gorm.DB) *gorm.DB {
+		return db.Order("created_on asc")
+	}).First(&user)
 	if state.Error != nil {
 		if gorm.IsRecordNotFoundError(state.Error) {
 			user = models.User{Username: username, Password: "", CreatedOn: time.Now().UTC()}

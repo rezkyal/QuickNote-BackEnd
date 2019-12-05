@@ -36,7 +36,7 @@ func (n *NoteQuery) FindNote(note_id int64) models.Note {
 
 func (n *NoteQuery) FindNoteByQuery(username string, query string) []models.Note {
 	var notes []models.Note
-	state := n.db.Where("Username = ? AND (Title LIKE ? or Note LIKE ?)", username, "%"+query+"%", "%"+query+"%").Find(&notes)
+	state := n.db.Where("Username = ? AND (LOWER(Title) LIKE ? or LOWER(Note) LIKE ?)", username, "%"+query+"%", "%"+query+"%").Order("created_on asc").Find(&notes)
 	if state.Error != nil {
 		if gorm.IsRecordNotFoundError(state.Error) {
 			return notes
