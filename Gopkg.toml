@@ -43,4 +43,4 @@
 
 [metadata.heroku]
   root-package = "github.com/rezkyal/Quicknote-BackEnd"
-  ensure = "false"
+  install = [ "./..." ]
