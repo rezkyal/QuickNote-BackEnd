@@ -74,8 +74,17 @@ func (u *UserController) SetNewPassword(c *gin.Context) {
 	username := session.Get("username").(string)
 
 	user := u.userQuery.FindOrCreateUser(username)
-	password := []byte(c.PostForm("password"))
-	setPassword(u, user, password)
+
+	password := c.PostForm("password")
+	confirmPassword := c.PostForm("confirmpassword")
+
+	if password != confirmPassword {
+		c.JSON(200, gin.H{"status": "0", "message": "Password and confirm password not match!"})
+		return
+	}
+
+	passwordByte := []byte(password)
+	setPassword(u, user, passwordByte)
 	c.JSON(200, gin.H{"status": "1", "username": username})
 }
 
@@ -84,7 +93,15 @@ func (u *UserController) ChangePassword(c *gin.Context) {
 	username := session.Get("username").(string)
 
 	user := u.userQuery.FindOrCreateUser(username)
-	oldpassword := []byte(c.PostForm("oldpassword"))
+	password := c.PostForm("oldpassword")
+	confirmPassword := c.PostForm("confirmpassword")
+
+	if password != confirmPassword {
+		c.JSON(200, gin.H{"status": "0", "message": "Old password and confirm password not match!"})
+		return
+	}
+
+	oldpassword := []byte(password)
 	newpassword := []byte(c.PostForm("newpassword"))
 	stats := checkPassword(u, user, oldpassword)
 
