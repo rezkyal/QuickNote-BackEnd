@@ -1,1 +1,1 @@
-web: bin/quicknote-backend
+web: ./bin/Quicknote-BackEnd
