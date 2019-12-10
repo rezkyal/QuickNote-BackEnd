@@ -4,9 +4,10 @@ import (
 	"log"
 	"os"
 
+	"github.com/gin-contrib/cors"
+
 	"github.com/gin-gonic/gin"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/memstore"
 
@@ -19,8 +20,8 @@ func main() {
 	r := gin.Default()
 
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"https://quiknote.herokuapp.com"}
-	// config.AllowOrigins = []string{"http://localhost:3000"}
+	// config.AllowOrigins = []string{"https://quiknote.herokuapp.com"}
+	config.AllowOrigins = []string{"http://localhost:3000"}
 	config.AllowCredentials = true
 
 	r.Use(cors.New(config))
@@ -57,6 +58,11 @@ func main() {
 	{
 		authorized.POST("/user/changePassword", userController.ChangePassword)
 
+		authorized.GET("/note/ws/:idnote", func(c *gin.Context) {
+			noteid := c.Param("idnote")
+			noteController.Wshandler(c.Writer, c.Request, noteid)
+		})
+
 		note := authorized.Group("/note")
 		note.GET("/readAllNote", noteController.ReadAllNote)
 		note.POST("/readSearchNote", noteController.ReadSearchNote)
@@ -65,6 +71,8 @@ func main() {
 		note.POST("/updateOneNote", noteController.UpdateOneNote)
 		note.POST("/deleteOneNote", noteController.DeleteOneNote)
 	}
+
+	r.Run()
 
 	port := os.Getenv("PORT")
 	if port == "" {

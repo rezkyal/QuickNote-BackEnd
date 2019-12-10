@@ -3,7 +3,10 @@ package controllers
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"strconv"
+
+	"github.com/gorilla/websocket"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/rezkyal/QuickNote-BackEnd/models"
@@ -11,18 +14,28 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/rezkyal/QuickNote-BackEnd/queryfunction"
+	"github.com/rezkyal/QuickNote-BackEnd/socketroom"
 	"github.com/rezkyal/QuickNote-BackEnd/util"
 )
 
 type NoteController struct {
 	userQuery *queryfunction.UserQuery
 	noteQuery *queryfunction.NoteQuery
+	upgrader  websocket.Upgrader
+	roomList  map[string]*socketroom.Room
 }
 
 func (n *NoteController) Init(db *gorm.DB) {
 	n.userQuery = &queryfunction.UserQuery{}
 	n.noteQuery = &queryfunction.NoteQuery{}
-
+	n.upgrader = websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+	}
+	n.upgrader.CheckOrigin = func(r *http.Request) bool {
+		return true
+	}
+	n.roomList = make(map[string]*socketroom.Room)
 	n.userQuery.Init(db)
 	n.noteQuery.Init(db)
 }
@@ -129,4 +142,20 @@ func (n *NoteController) DeleteOneNote(c *gin.Context) {
 	n.noteQuery.DeleteNote(note)
 	c.JSON(200, gin.H{
 		"success": "true"})
+}
+
+func (n *NoteController) Wshandler(w http.ResponseWriter, r *http.Request, noteid string) {
+	c, err := n.upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Panic(err)
+		return
+	}
+	defer c.Close()
+
+	if _, ok := n.roomList[noteid]; !ok {
+		n.roomList[noteid] = socketroom.NewRoom(n.noteQuery)
+		go n.roomList[noteid].Run()
+	}
+
+	n.roomList[noteid].AddClient(c)
 }
