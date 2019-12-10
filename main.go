@@ -21,7 +21,8 @@ func main() {
 
 	config := cors.DefaultConfig()
 	// config.AllowOrigins = []string{"https://quiknote.herokuapp.com"}
-	config.AllowOrigins = []string{"http://localhost:3000"}
+	// config.AllowOrigins = []string{"http://localhost:3000"}
+	config.AllowOrigins = []string{os.Getenv("FRONTEND_POINT")}
 	config.AllowCredentials = true
 
 	r.Use(cors.New(config))
@@ -68,7 +69,7 @@ func main() {
 		note.POST("/readSearchNote", noteController.ReadSearchNote)
 		note.GET("/createOneNote", noteController.CreateOneNote)
 		note.POST("/readOneNote", noteController.ReadOneNote)
-		note.POST("/updateOneNote", noteController.UpdateOneNote)
+		// note.POST("/updateOneNote", noteController.UpdateOneNote)
 		note.POST("/deleteOneNote", noteController.DeleteOneNote)
 	}
 
